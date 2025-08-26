@@ -35,5 +35,10 @@ public class Main {
         queue3.offer(1);
         queue3.offer(3);
         System.out.println(queue3);
+        Deque<Integer> deque = new LinkedList<>();
+        deque.addFirst(1);
+        deque.addLast(2);
+        deque.addLast(3);
+        System.out.println(deque);
     }
 }
