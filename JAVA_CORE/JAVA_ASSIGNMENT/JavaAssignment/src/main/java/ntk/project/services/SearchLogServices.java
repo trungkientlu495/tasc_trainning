@@ -65,7 +65,9 @@ public class SearchLogServices {
         return new HashSet<>(listLog);
     }
 
-    
+    public Set<String> searchDataFromFileLog() {
+        
+    }
 
 
 }
