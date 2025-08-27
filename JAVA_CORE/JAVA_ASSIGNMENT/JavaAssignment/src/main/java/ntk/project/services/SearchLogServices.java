@@ -4,9 +4,7 @@ import ntk.project.dto.SearchLog;
 import ntk.project.exception.CustomException;
 import ntk.project.utills.DateTimeParser;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -90,11 +88,20 @@ public class SearchLogServices extends DateTimeParser {
                         return; // thoát task ngay
                     }
                     String time = listDataLogFile.get(j)[0]+ " "+listDataLogFile.get(j)[1];
+                    String logName = listDataLogFile.get(j)[2].toString();
+                    String logServicesName = listDataLogFile.get(j)[3].toString();
+                    String message = "";
+                    for(int k=4;k<listDataLogFile.get(j).length;k++){
+                        message = message + listDataLogFile.get(j)[k].toString();
+                    }
                     try {
                         LocalDateTime c = parseDataLogFile(time);
                         if(c.isAfter(parseDataLogFile(searchLog.getStartTimeLogSearch()))
                                 &&
                                 c.isBefore(parseDataLogFile(searchLog.getEndTimeLogSearch()))
+                                && logName.equals(searchLog.getLogName())
+                                && message.contains(searchLog.getLogMessage())
+
                         ) {
                             a.add(listDataLogFile.get(j));
                         }
@@ -114,8 +121,22 @@ public class SearchLogServices extends DateTimeParser {
         return a;
     }
 
-    public void exportDataLogToFile(Set<Object[]> dataLogFile, int countThread) {
-
+    public void exportDataLogToFile(Set<Object[]> dataLogFile) {
+        String fileName = "output.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for(Object[] dataLog : dataLogFile) {
+                String data = "";
+                for(int i=0;i<dataLog.length;i++) {
+                    data = data + dataLog[i].toString() + " ";
+                }
+                writer.write(data);
+                writer.newLine();
+                System.out.println(data);
+            }
+            System.out.println("Ghi file thành công!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -18,28 +18,20 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("Nhập số thread cần dùng trong thread pool là: ");
         countThread = sc.nextInt();
-        String pathFileName = "a.txt";
+        String pathFileName = "sample_log.txt";
         String[] allowedExtensions = new String[]{"txt"};
         String[] allowedMimeTypes = new String[]{"text/plain"};
         SearchLogServices searchLogServices = new SearchLogServices(new FileValidServicesImpl());
         Set<Object[]> test = searchLogServices.readFileLog(pathFileName,countThread,allowedExtensions,allowedMimeTypes);
         System.out.println("MMMMMMMMMMMMMMMMMMMMMM: "+test.size());
-        // check cac thread lay ra co dung voi du lieu tu file ban dau khong - start
-        //Set<String> listFromFile = Files.readAllLines(Paths.get(pathFileName)).stream().collect(Collectors.toSet()); // đọc file gốc
-        //Set<String> setFromFile = new HashSet<>(listFromFile);
-        // bỏ qua thứ tự, check tất cả phần tử có tồn tại
-        //boolean allPresent = setFromFile.containsAll(test);
-        //System.out.println(allPresent ? "Đầy đủ" : "Thiếu dòng");
-        // check cac thread lay ra co dung voi du lieu tu file ban dau khong - end
         SearchLog searchLog = new SearchLog();
         searchLog.setStartTimeLogSearch("2025-08-26 03:58:23");
         searchLog.setEndTimeLogSearch("2025-08-26 03:58:26");
+        searchLog.setLogName("DEBUG");
+        searchLog.setLogMessage("D");
         List<Object[]> test2 = searchLogServices.searchDataFromFileLog(test,countThread,
                 searchLog).stream().toList();
-        for(Object[] obj : test2) {
-            System.out.println("KIENDEPZAI: "+(obj[0].toString()+" "+obj[1].toString()));
-        }
-
-
+        searchLogServices.exportDataLogToFile(searchLogServices.searchDataFromFileLog(test,countThread,
+                searchLog));
     }
 }
