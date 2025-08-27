@@ -1,0 +1,7 @@
+[2025-08-26 03:58:23] [ERROR] [UserService] - Database connection established
+[2025-08-26 03:58:23] [DEBUG] [UserService] - Payment failed due to insufficient funds
+[2025-08-26 03:58:23] [DEBUG] [PaymentService] - Payment failed due to insufficient funds
+[2025-08-26 03:58:23] [DEBUG] [UserService] - User logged in successfully
+[2025-08-26 03:58:23] [WARN] [OrderService] - Invalid credentials provided
+[2025-08-26 03:58:23] [INFO] [UserService] - Service started on port 8080
+[2025-08-26 03:58:23] [INFO] [PaymentService] - Database connection established
