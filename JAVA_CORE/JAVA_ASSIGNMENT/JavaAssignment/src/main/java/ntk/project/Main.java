@@ -22,16 +22,14 @@ public class Main {
         String[] allowedExtensions = new String[]{"txt"};
         String[] allowedMimeTypes = new String[]{"text/plain"};
         SearchLogServices searchLogServices = new SearchLogServices(new FileValidServicesImpl());
-        Set<Object[]> test = searchLogServices.readFileLog(pathFileName,countThread,allowedExtensions,allowedMimeTypes);
-        System.out.println("MMMMMMMMMMMMMMMMMMMMMM: "+test.size());
+        Set<Object[]> setDataLogFile = searchLogServices.readFileLog(pathFileName,countThread,allowedExtensions,allowedMimeTypes);
+        System.out.println("Kích thước của file data: "+setDataLogFile.size());
         SearchLog searchLog = new SearchLog();
         searchLog.setStartTimeLogSearch("2025-08-26 03:58:23");
         searchLog.setEndTimeLogSearch("2025-08-26 03:58:26");
         searchLog.setLogName("DEBUG");
         searchLog.setLogMessage("D");
-        List<Object[]> test2 = searchLogServices.searchDataFromFileLog(test,countThread,
-                searchLog).stream().toList();
-        searchLogServices.exportDataLogToFile(searchLogServices.searchDataFromFileLog(test,countThread,
+        searchLogServices.exportDataLogToFile(searchLogServices.searchDataFromFileLog(setDataLogFile,countThread,
                 searchLog));
     }
 }
