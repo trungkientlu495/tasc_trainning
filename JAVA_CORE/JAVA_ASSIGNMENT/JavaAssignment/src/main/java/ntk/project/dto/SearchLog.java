@@ -3,31 +3,49 @@ package ntk.project.dto;
 import java.time.LocalDateTime;
 
 public class SearchLog {
-    private String log;
-    private String date;
-    private String message;
+    private String logName;
+    private String startTimeLogSearch;
+    private String endTimeLogSearch;
+    private String servicesName;
+    private String logMessage;
 
-    public String getLog() {
-        return log;
+    public String getLogName() {
+        return logName;
     }
 
-    public void setLog(String log) {
-        this.log = log;
+    public void setLogName(String logName) {
+        this.logName = logName;
     }
 
-    public String getDate() {
-        return date;
+    public String getStartTimeLogSearch() {
+        return startTimeLogSearch;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setStartTimeLogSearch(String startTimeLogSearch) {
+        this.startTimeLogSearch = startTimeLogSearch;
     }
 
-    public String getMessage() {
-        return message;
+    public String getEndTimeLogSearch() {
+        return endTimeLogSearch;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setEndTimeLogSearch(String endTimeLogSearch) {
+        this.endTimeLogSearch = endTimeLogSearch;
+    }
+
+    public String getServicesName() {
+        return servicesName;
+    }
+
+    public void setServicesName(String servicesName) {
+        this.servicesName = servicesName;
+    }
+
+    public String getLogMessage() {
+        return logMessage;
+    }
+
+    public void setLogMessage(String logMessage) {
+        this.logMessage = logMessage;
     }
 }
