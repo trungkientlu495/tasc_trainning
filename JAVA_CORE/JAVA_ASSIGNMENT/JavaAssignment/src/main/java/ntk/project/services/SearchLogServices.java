@@ -23,7 +23,7 @@ public class SearchLogServices extends DateTimeParser {
     }
 
     public Set<Object[]> readFileLog(String pathFileName, int countThread
-    , String[] allowedExtensions, String[] allowedMimeTypes) throws IOException, InterruptedException {
+            , String[] allowedExtensions, String[] allowedMimeTypes) throws IOException, InterruptedException {
         // check file truyen vao co hop le khong
         boolean isValidFile = fileValidServices.isValidFile(
                 pathFileName,5000,0,allowedExtensions,allowedMimeTypes
@@ -50,7 +50,7 @@ public class SearchLogServices extends DateTimeParser {
                         }
                         String line = listLogString.get(j);
                         Object[] dataLog = Arrays.stream(line.split(" ")).map(
-                                x -> x.replaceAll("[\\[\\]]", "")
+                                        x -> x.replaceAll("[\\[\\]]", "")
                                 )
                                 .filter(x -> x.equals("-") == false).toArray(Object[]::new);
                         listLog.add(dataLog);
