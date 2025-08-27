@@ -73,7 +73,7 @@ public class SearchLogServices extends DateTimeParser {
 
     public Set<Object[]> searchDataFromFileLog(Set<Object[]> dataLogFile,int countThread
             ,SearchLog searchLog) throws InterruptedException {
-        Set<Object[]> a = Collections.synchronizedSet(new HashSet<>());
+        Set<Object[]> setSearchDataFromFileLog = Collections.synchronizedSet(new HashSet<>());
         int lines = dataLogFile.size();
         ExecutorService executor = Executors.newFixedThreadPool(countThread);
         int chunkSize = lines/countThread;
@@ -103,7 +103,7 @@ public class SearchLogServices extends DateTimeParser {
                                 && message.contains(searchLog.getLogMessage())
 
                         ) {
-                            a.add(listDataLogFile.get(j));
+                            setSearchDataFromFileLog.add(listDataLogFile.get(j));
                         }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -118,7 +118,7 @@ public class SearchLogServices extends DateTimeParser {
             executor.shutdownNow();
             System.exit(1);
         }
-        return a;
+        return setSearchDataFromFileLog;
     }
 
     public void exportDataLogToFile(Set<Object[]> dataLogFile) {
