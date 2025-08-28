@@ -1,1 +1,11 @@
-query
+1, Trong 1 câu query thứ tự thực hiện của các thành phần như thế nào
+FROM
+ON
+JOIN
+WHERE
+GROUP BY
+HAVING
+SELECT
+ORDER BY
+LIMIT/OFFSET
+
