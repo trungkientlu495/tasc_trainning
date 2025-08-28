@@ -18,6 +18,8 @@ mãn điều kiện on thì nó trả về null
 điều kiện on thì nó trả về null
 - FULL OUTER JOIN: lấy toàn bộ dữ liệu của cả 2 bảng , nếu dữ liệu của 2 bảng
 không thỏa mãn điều kiện on thì nó trả về null
+- CROSS JOIN: không có điều kiện on , cross join dùng để nối các row của bảng A cho lần lượt các row 
+của bảng B
 * Sub Query
 - Subquery trong WHERE
 + Dùng để lọc dữ liệu dựa trên kết quả của subquery , nó thường dùng với in , not in , exists
