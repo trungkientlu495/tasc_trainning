@@ -65,3 +65,47 @@ HAVING COUNT(*) > (
         GROUP BY student_id
     ) AS t
 );
+* CTE (Common Table Expression):
+- Định nghĩa 
++ CTE (Common Table Expression) là một biểu thức bảng tạm thời, được định nghĩa trong 1 câu SQL bằng từ khóa WITH.
++ Nó giống như một “bảng ảo” mà bạn có thể sử dụng ngay trong query chính.
++ Khác với VIEW, CTE chỉ tồn tại trong phạm vi query hiện tại.
+- Các loại CTE
+a, CTE không đệ quy 
+- Giống subquery nhưng viết dễ đọc hơn.
+- Dùng để gom nhóm, tính toán trung gian rồi dùng lại trong query chính.
+ví dụ: 
+WITH SubjectCount AS (
+    SELECT student_id, COUNT(*) AS subject_count
+    FROM Enrollments
+    GROUP BY student_id
+)
+SELECT AVG(subject_count) AS avg_subjects_per_student
+FROM SubjectCount;
+b, CTE đệ quy 
+Dùng khi dữ liệu có tính chất cây (hierarchy): ví dụ nhân viên – quản lý, thư mục cha – con.
+CTE đệ quy gồm 2 phần:
+Anchor member: câu query cơ bản (điểm bắt đầu).
+Recursive member: câu query gọi lại chính nó.
+ví dụ: 
+WITH RECURSIVE EmployeeHierarchy AS (
+    -- Anchor: chọn ông sếp gốc (CEO)
+    SELECT id, name, manager_id, 1 AS level
+    FROM Employees
+    WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- Recursive: tìm nhân viên dưới quyền
+    SELECT e.id, e.name, e.manager_id, eh.level + 1
+    FROM Employees e
+    INNER JOIN EmployeeHierarchy eh ON e.manager_id = eh.id
+)
+SELECT *
+FROM EmployeeHierarchy
+ORDER BY level;
+- Ứng dụng của CTE
+Thay thế subquery → Query dễ đọc hơn.
+Phân tích dữ liệu nhiều tầng → Có thể viết nhiều bước xử lý tuần tự.
+Xử lý dữ liệu cây/phân cấp → Dùng CTE đệ quy.
+Tái sử dụng logic phức tạp → Giúp tránh lặp lại query.
