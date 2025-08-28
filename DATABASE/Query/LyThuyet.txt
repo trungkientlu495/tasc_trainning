@@ -117,3 +117,21 @@ Tái sử dụng logic phức tạp → Giúp tránh lặp lại query.
 + RANK(): GÁN SỐ THỨ TỰ CHO CÁC BẢN GHI , NẾU CÁC BẢN GHI TRÙNG GIÁ TRỊ THÌ TRÙNG RANK VÀ CÁC BẢN GHI SAU SẼ BỊ CHẬM SỐ LẦN BẢN
 GHI TRÙNG VÍ DỤ CÓ 2 BẢN GHI TRÙNG VỊ TRÍ 2 BẢN GHI LÀ 2 THÌ BẢN GHI KẾ TIẾP CÓ VI TRÍ LÀ 4
 + DENSE_RANK(): GIỐNG RANK() NHƯNG KHÔNG NHẢY SỐ Ở BẢN GHI KẾ TIẾP
+* View
+- VIEW là một bảng ảo được tạo ra từ một câu lệnh SELECT.
+- VIEW không lưu dữ liệu riêng (trừ materialized view trong một số DB như Oracle, PostgreSQL), mà dữ liệu luôn được lấy từ bảng gốc.
+- Có thể coi VIEW như một query được đặt tên, giúp tái sử dụng và đơn giản hóa các câu lệnh phức tạp.
+cú pháp view: 
+CREATE VIEW view_name AS
+SELECT ...
+FROM ...
+WHERE ...;
+xem dữ liệu trong view: 
+select * from view_name
+a, Ưu điểm của view 
+Đơn giản hóa query: Gom các câu lệnh phức tạp thành 1 view dễ gọi.
+Tái sử dụng: Viết một lần, dùng nhiều lần
+Bảo mật: Hạn chế quyền truy cập trực tiếp bảng gốc (cho user chỉ query được view).
+Tách biệt logic: Nếu cấu trúc bảng gốc thay đổi, có thể điều chỉnh trong view mà không cần sửa tất cả query.
+b, CRUD trên view
+- Có thể update,insert,delete nếu trong view chỉ có 1 table nếu có 2 table thì se không được
