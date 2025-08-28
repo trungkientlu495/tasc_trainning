@@ -8,4 +8,58 @@ HAVING
 SELECT
 ORDER BY
 LIMIT/OFFSET
-
+2, Tìm hiểu và lấy ví dụ về
+* Các loại JOIN (INNER JOIN,LEFT JOIN , RIGHT RIGHT,FULL OUTER JOIN)
+- INNER JOIN: lấy dữ liệu của 2 bảng thỏa mãn điều kiện on
+ví dụ select * from film x inner join film_actor y on x.film_id = y.film_id
+- LEFT JOIN: lấy toàn bộ dữ liệu của bảng bên trái , còn bảng bên phải nếu không thoả
+mãn điều kiện on thì nó trả về null
+- RIGHT JOIN: lấy toàn bộ dữ liệu của bảng bên phải , còn bảng bên trái nêu không thỏa mãn
+điều kiện on thì nó trả về null
+- FULL OUTER JOIN: lấy toàn bộ dữ liệu của cả 2 bảng , nếu dữ liệu của 2 bảng
+không thỏa mãn điều kiện on thì nó trả về null
+* Sub Query
+- Subquery trong WHERE
++ Dùng để lọc dữ liệu dựa trên kết quả của subquery , nó thường dùng với in , not in , exists
+, = , < , >  <= , >=
+ví dụ: 
+SELECT name
+FROM Students
+WHERE id IN (
+    SELECT student_id
+    FROM Enrollments
+    WHERE subject = 'Math'
+);
+- Subquery trong SELECT
++ Dùng để tính toán cho giá trị mỗi hàng
++ Kết quả của subquery trả về 1 giá trị duy nhất
+ví dụ
+SELECT name,
+       (SELECT COUNT(*)
+        FROM Enrollments e
+        WHERE e.student_id = s.id) AS subject_count
+FROM Students s;
+- Subquery trong FROM 
++ Truy vấn con đóng vai trò như bảng tạm thời.
++ Dùng khi cần nhóm hoặc tính toán trung gian.
+ví dụ:
+SELECT avg_count.avg
+FROM (
+    SELECT student_id, COUNT(*) AS avg
+    FROM Enrollments
+    GROUP BY student_id
+) AS avg_count;
+- Subquery trong having
++ Dùng để lọc nhóm sau khi đã group by
+ví dụ:
+SELECT student_id, COUNT(*) AS subjects
+FROM Enrollments
+GROUP BY student_id
+HAVING COUNT(*) > (
+    SELECT AVG(subject_count)
+    FROM (
+        SELECT COUNT(*) AS subject_count
+        FROM Enrollments
+        GROUP BY student_id
+    ) AS t
+);
