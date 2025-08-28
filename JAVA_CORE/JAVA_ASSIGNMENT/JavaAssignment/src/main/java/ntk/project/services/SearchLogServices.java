@@ -5,25 +5,21 @@ import ntk.project.exception.CustomException;
 import ntk.project.utills.DateTimeParser;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.concurrent.*;
 
 public class SearchLogServices extends DateTimeParser {
     private final FileValidServices fileValidServices;
-
     public SearchLogServices(FileValidServices fileValidServices) {
         this.fileValidServices = fileValidServices;
     }
 
-    public Set<Object[]> readFileLog(String pathFileName, int countThread
-            , String[] allowedExtensions, String[] allowedMimeTypes) throws IOException, InterruptedException {
+    public List<Object[]> readFileLog(String pathFileName, int countThread
+            , String[] allowedExtensions, String[] allowedMimeTypes,long lines,long chunkSize
+    ) throws IOException, InterruptedException {
+        long startTime = System.currentTimeMillis(); // bắt đầu đo
         // check file truyen vao co hop le khong
         boolean isValidFile = fileValidServices.isValidFile(
                 pathFileName,5000,0,allowedExtensions,allowedMimeTypes
@@ -32,25 +28,23 @@ public class SearchLogServices extends DateTimeParser {
             throw new CustomException("You enter file is not valid");
         }
         List<Object[]> listLog = Collections.synchronizedList(new ArrayList<>());
-        int lines =(int) Files.lines(Paths.get(pathFileName)).count();
-        System.out.println("Kien: "+lines);
         // tao thread pool
         ExecutorService executor = Executors.newFixedThreadPool(countThread);
-        int chunkSize = lines/countThread;
         try (BufferedReader br = new BufferedReader(new FileReader(pathFileName))) {
-            List<String> listLogString = br.lines().collect(Collectors.toList());
-            for(int i=0;i<countThread;i++){
-                final int start = i * chunkSize;
-                final int end = (i == countThread-1) ? lines : start + chunkSize;
+            List<String> listLogString = br.lines().toList();
+            for(long i=0;i<countThread;i++){
+                final long start = i * chunkSize;
+                final long end = (i == countThread-1) ? lines : start + chunkSize;
                 executor.submit(() -> {
-                    for (int j = start; j < end; j++) {
+                    for (long j = start; j < end; j++) {
                         if (Thread.currentThread().isInterrupted()) {
                             System.out.println("Task bị interrupt, dừng tại dòng " + j);
                             return; // thoát task ngay
                         }
-                        String line = listLogString.get(j);
+                        String line = listLogString.get((int)j);
+
                         Object[] dataLog = Arrays.stream(line.split(" ")).map(
-                                        x -> x.replaceAll("[\\[\\]]", "")
+                                        x -> x.replace("[","").replace("]","")
                                 )
                                 .filter(x -> x.equals("-") == false).toArray(Object[]::new);
                         listLog.add(dataLog);
@@ -63,47 +57,56 @@ public class SearchLogServices extends DateTimeParser {
             throw new CustomException(e.getMessage());
         }
         executor.shutdown();
-        if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+        if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)) {
             System.out.println("Timeout! Dừng chương trình.");
             executor.shutdownNow();
             System.exit(1);
         }
-        return new HashSet<>(listLog);
+        long endTime = System.currentTimeMillis(); // kết thúc đo
+        System.out.println("Tổng thời gian chạy chương trình: " + (endTime - startTime) + " ms");
+        return new ArrayList<>(listLog);
     }
 
-    public Set<Object[]> searchDataFromFileLog(Set<Object[]> dataLogFile,int countThread
-            ,SearchLog searchLog) throws InterruptedException {
-        Set<Object[]> setSearchDataFromFileLog = Collections.synchronizedSet(new HashSet<>());
-        int lines = dataLogFile.size();
+    public Set<Object[]> searchDataFromFileLog(List<Object[]> listDataLogFile
+            ,int countThread
+            ,SearchLog searchLog,long lines
+    ,long chunkSize) throws InterruptedException {
+        long startTime = System.currentTimeMillis(); // bắt đầu đo
+        Set<Object[]> setSearchDataFromFileLog = ConcurrentHashMap.newKeySet();
         ExecutorService executor = Executors.newFixedThreadPool(countThread);
-        int chunkSize = lines/countThread;
-        List<Object[]> listDataLogFile = dataLogFile.stream().collect(Collectors.toList());
-        for(int i=0;i<countThread;i++){
-            final int start = i * chunkSize;
-            final int end = (i == countThread-1) ? lines : start + chunkSize;
+        // Parse startTime và endTime 1 lần ngoài loop
+        LocalDateTime startSearch = parseDataLogFile(searchLog.getStartTimeLogSearch());
+        LocalDateTime endSearch = parseDataLogFile(searchLog.getEndTimeLogSearch());
+        for(long i=0;i<countThread;i++){
+            final long start = i * chunkSize;
+            final long end = (i == countThread-1) ? lines : start + chunkSize;
             executor.submit(() -> {
-                for (int j = start; j < end; j++) {
+                for (long j = start; j < end; j++) {
+                    StringBuilder sbMessage = new StringBuilder();
+                    StringBuilder sbTime = new StringBuilder();
                     if (Thread.currentThread().isInterrupted()) {
                         System.out.println("Task bị interrupt, dừng tại dòng " + j);
                         return; // thoát task ngay
                     }
-                    String time = listDataLogFile.get(j)[0]+ " "+listDataLogFile.get(j)[1];
-                    String logName = listDataLogFile.get(j)[2].toString();
-                    String logServicesName = listDataLogFile.get(j)[3].toString();
-                    String message = "";
-                    for(int k=4;k<listDataLogFile.get(j).length;k++){
-                        message = message + listDataLogFile.get(j)[k].toString();
+                    sbTime.append(listDataLogFile.get((int)j)[0]);
+                    sbTime.append(" ");
+                    sbTime.append(listDataLogFile.get((int)j)[1]);
+                    String logName = listDataLogFile.get((int)j)[2].toString();
+                    String logServicesName = listDataLogFile.get((int)j)[3].toString();
+                    for(int k=4;k<listDataLogFile.get((int)j).length;k++){
+                        sbMessage.append(listDataLogFile.get((int)j)[k].toString());
                     }
                     try {
-                        LocalDateTime c = parseDataLogFile(time);
-                        if(c.isAfter(parseDataLogFile(searchLog.getStartTimeLogSearch()))
+                        LocalDateTime c = parseDataLogFile(sbTime.toString());
+                        if(c.isAfter(startSearch)
                                 &&
-                                c.isBefore(parseDataLogFile(searchLog.getEndTimeLogSearch()))
+                                c.isBefore(endSearch)
                                 && logName.equals(searchLog.getLogName())
-                                && message.contains(searchLog.getLogMessage())
+                                && logServicesName.equals(searchLog.getServicesName())
+                                && sbMessage.toString().contains(searchLog.getLogMessage())
 
                         ) {
-                            setSearchDataFromFileLog.add(listDataLogFile.get(j));
+                            setSearchDataFromFileLog.add(listDataLogFile.get((int)j));
                         }
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
@@ -113,25 +116,27 @@ public class SearchLogServices extends DateTimeParser {
             });
         }
         executor.shutdown();
-        if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+        if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)) {
             System.out.println("Timeout! Dừng chương trình.");
             executor.shutdownNow();
             System.exit(1);
         }
+        long endTime = System.currentTimeMillis(); // kết thúc đo
+        System.out.println("Tổng thời gian chạy chương trình: " + (endTime - startTime) + " ms");
         return setSearchDataFromFileLog;
     }
 
     public void exportDataLogToFile(Set<Object[]> dataLogFile) {
         String fileName = "output.txt";
+        StringBuffer sbData = new StringBuffer();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for(Object[] dataLog : dataLogFile) {
-                String data = "";
                 for(int i=0;i<dataLog.length;i++) {
-                    data = data + dataLog[i].toString() + " ";
+                    sbData.append(dataLog[i].toString());
+                    sbData.append(" ");
                 }
-                writer.write(data);
+                writer.write(sbData.toString());
                 writer.newLine();
-                System.out.println(data);
             }
             System.out.println("Ghi file thành công!");
         } catch (IOException e) {
@@ -142,7 +147,34 @@ public class SearchLogServices extends DateTimeParser {
     @Override
     public LocalDateTime parseDataLogFile(String time) throws InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(time, formatter);
-        return dateTime;
+        return LocalDateTime.parse(time, formatter);
+    }
+
+    public Object[] parseLogLineFast(String line) {
+        // Tách dòng theo khoảng trắng
+        String[] tokens = line.split(" "); // array tạm token
+
+        // List để lưu token hợp lệ
+        List<String> result = new ArrayList<>(tokens.length);
+
+        // Duyệt từng token
+        for (String token : tokens) {
+            if (token.equals("-")) continue; // bỏ token là "-"
+
+            // Dùng StringBuilder để loại bỏ dấu '[' và ']'
+            StringBuilder sb = new StringBuilder(token.length());
+            for (int i = 0; i < token.length(); i++) {
+                char c = token.charAt(i);
+                if (c != '[' && c != ']') {
+                    sb.append(c);
+                }
+            }
+
+            // Thêm token đã xử lý vào list
+            result.add(sb.toString());
+        }
+
+        // Chuyển sang Object[] nếu cần
+        return result.toArray(new Object[0]);
     }
 }
