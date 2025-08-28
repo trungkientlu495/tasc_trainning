@@ -109,3 +109,11 @@ Thay thế subquery → Query dễ đọc hơn.
 Phân tích dữ liệu nhiều tầng → Có thể viết nhiều bước xử lý tuần tự.
 Xử lý dữ liệu cây/phân cấp → Dùng CTE đệ quy.
 Tái sử dụng logic phức tạp → Giúp tránh lặp lại query.
+* RANKING 
+- Định nghĩa: là các window function giúp bạn gán các thứ tự cho các bản ghi theo một tiêu chí sắp xếp nào đó
+- Các hàm ranking phổ biến là: ROW_NUMBER(),RANK(),DENSE_RANK()
+- Các loại ranking functions
++ ROW_NUMBER(): GÁN SỐ THỨ TỰ CHO CÁC BẢN GHI , NẾU DB CÓ CÁC BẢN GHI TRÙNG NHAU THÌ VẪN ĐÁNH SỐ THỨ TỰ LIÊN TIẾP
++ RANK(): GÁN SỐ THỨ TỰ CHO CÁC BẢN GHI , NẾU CÁC BẢN GHI TRÙNG GIÁ TRỊ THÌ TRÙNG RANK VÀ CÁC BẢN GHI SAU SẼ BỊ CHẬM SỐ LẦN BẢN
+GHI TRÙNG VÍ DỤ CÓ 2 BẢN GHI TRÙNG VỊ TRÍ 2 BẢN GHI LÀ 2 THÌ BẢN GHI KẾ TIẾP CÓ VI TRÍ LÀ 4
++ DENSE_RANK(): GIỐNG RANK() NHƯNG KHÔNG NHẢY SỐ Ở BẢN GHI KẾ TIẾP
