@@ -30,11 +30,11 @@ public class Main {
                 ,allowedExtensions,allowedMimeTypes,lines,chunkSize);
         System.out.println("Kích thước của file data: "+lines);
         SearchLog searchLog = new SearchLog();
-        searchLog.setStartTimeLogSearch("2025-08-26 03:58:23");
-        searchLog.setEndTimeLogSearch("2025-08-26 03:58:26");
+        searchLog.setStartTimeLogSearch("2025-08-26 03:58:25");
+        searchLog.setEndTimeLogSearch("2025-08-26 03:58:27");
         searchLog.setLogName("DEBUG");
-        searchLog.setLogMessage("D");
-        searchLog.setServicesName("PaymentService");
+        searchLog.setLogMessage("expired");
+        searchLog.setServicesName("AuthService");
         searchLogServices.exportDataLogToFile(searchLogServices.searchDataFromFileLog(listDataLogFile,countThread,
                 searchLog,lines,chunkSize));
         long endTime = System.currentTimeMillis(); // kết thúc đo

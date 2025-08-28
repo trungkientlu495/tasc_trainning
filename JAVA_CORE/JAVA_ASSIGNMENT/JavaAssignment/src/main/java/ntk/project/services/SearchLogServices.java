@@ -128,9 +128,9 @@ public class SearchLogServices extends DateTimeParser {
 
     public void exportDataLogToFile(Set<Object[]> dataLogFile) {
         String fileName = "output.txt";
-        StringBuffer sbData = new StringBuffer();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             for(Object[] dataLog : dataLogFile) {
+                StringBuilder sbData = new StringBuilder();
                 for(int i=0;i<dataLog.length;i++) {
                     sbData.append(dataLog[i].toString());
                     sbData.append(" ");
@@ -162,16 +162,10 @@ public class SearchLogServices extends DateTimeParser {
             if (token.equals("-")) continue; // bỏ token là "-"
 
             // Dùng StringBuilder để loại bỏ dấu '[' và ']'
-            StringBuilder sb = new StringBuilder(token.length());
-            for (int i = 0; i < token.length(); i++) {
-                char c = token.charAt(i);
-                if (c != '[' && c != ']') {
-                    sb.append(c);
-                }
-            }
+            token = token.replace("[","").replace("]","");
 
             // Thêm token đã xử lý vào list
-            result.add(sb.toString());
+            result.add(token);
         }
 
         // Chuyển sang Object[] nếu cần
