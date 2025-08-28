@@ -135,3 +135,25 @@ Bảo mật: Hạn chế quyền truy cập trực tiếp bảng gốc (cho user
 Tách biệt logic: Nếu cấu trúc bảng gốc thay đổi, có thể điều chỉnh trong view mà không cần sửa tất cả query.
 b, CRUD trên view
 - Có thể update,insert,delete nếu trong view chỉ có 1 table nếu có 2 table thì se không được
+* STORED PROCEDURE: là một tập hợp các câu lệnh SQL được biên dịch sẵn và lưu trong database. 
+Người dùng hoặc ứng dụng có thể gọi procedure này để thực thi logic đã định nghĩa.
+- Cấu trúc khởi tạo 1 stored procedure: 
+- Cách dùng
+- Đặc điểm
++ Ưu điểm: 
+Tái sử dụng: viết một lần, gọi nhiều lần.
+Bảo mật: ẩn logic phức tạp, chỉ cho phép gọi mà không cần cho phép SELECT trực tiếp.
+Tăng hiệu suất: procedure thường được DBMS biên dịch sẵn (compiled).
+Dễ bảo trì: sửa logic 1 chỗ, không phải sửa trong từng ứng dụng.
++ Nhược điểm:
+Logic business viết trong DB → có thể khó maintain khi dự án lớn (so với để ở code backend).
+Khác nhau giữa các hệ quản trị (MySQL, SQL Server, Oracle có cú pháp khác).
+- Áp dụng khi nào: 
+Khi cần tái sử dụng một logic SQL nhiều lần.
+Khi cần xử lý phức tạp trong DB (vd: tính toán, cập nhật nhiều bảng cùng lúc).
+Khi muốn tăng tốc độ (hạn chế gửi nhiều câu lệnh từ ứng dụng).
+Khi cần bảo mật (ẩn dữ liệu thật, chỉ cho phép gọi procedure).
+Trong ETL (Extract-Transform-Load), xử lý dữ liệu batch.
+(LƯU Ý KHÔNG NÊN ĐỂ LOGIC QUÁ PHỨC TẠP Ở PROCEDURE NÊN ĐỂ BACKEND VÌ KHI LƯU TRƯ LOGIC PHỨC TẠP TRONG DB THÌ DB CẦN THÊM NHIỀU BỘ NHỚ
+KHI ĐẤY LẠI PHẢI NÂNG CẤP THÊM NHƯNG KHI ĐẾN 1 GIỚI HẠN NHẤT ĐỊNH NÀO ĐẤY THÌ SẼ K THỂ NÂNG CẤP ĐƯỢC NỮA CÒN PHÍA BACKEND
+CÓ THỂ THÊM NHIỀU SERVER ĐỂ CÂN BẰNG TẢI GIẢM THIỂU REQUEST TRUY CẬP VÀO
