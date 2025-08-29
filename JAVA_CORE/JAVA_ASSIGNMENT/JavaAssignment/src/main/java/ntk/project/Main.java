@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis(); // bắt đầu đo
         int countThread;
-        countThread = Runtime.getRuntime().availableProcessors();
+        countThread = 50;
         System.out.println("Quantity Thread: " + countThread);
         String pathFileName = "sample_log.txt";
         String[] allowedExtensions = new String[]{"txt"};

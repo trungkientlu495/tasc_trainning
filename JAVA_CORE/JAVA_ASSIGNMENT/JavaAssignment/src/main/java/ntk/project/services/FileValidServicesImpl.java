@@ -22,7 +22,6 @@ public class FileValidServicesImpl implements FileValidServices {
         return (file.exists() && file.isFile() && fileSize <= FileValidServicesImpl.MAX_SIZE_FILE) ? true : false;
     }
 
-    @Override
     public boolean isValidExtension(String pathFileName, String[] allowedExtensions) {
         int indexStartExtension = pathFileName.lastIndexOf('.');
         String extension = pathFileName.substring(indexStartExtension+1);

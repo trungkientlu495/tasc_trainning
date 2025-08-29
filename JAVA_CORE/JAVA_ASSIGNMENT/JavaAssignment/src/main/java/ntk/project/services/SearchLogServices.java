@@ -31,18 +31,18 @@ public class SearchLogServices extends DateTimeParser {
         // tao thread pool
         ExecutorService executor = Executors.newFixedThreadPool(countThread);
         try (BufferedReader br = new BufferedReader(new FileReader(pathFileName))) {
-            List<String> listLogString = br.lines().toList();
+            List<List<String>> listLogString = chiaFile(pathFileName,chunkSize);
             for(long i=0;i<countThread;i++){
                 final long start = i * chunkSize;
                 final long end = (i == countThread-1) ? lines : start + chunkSize;
+                final int index = (int)i;
                 executor.submit(() -> {
                     for (long j = start; j < end; j++) {
                         if (Thread.currentThread().isInterrupted()) {
                             System.out.println("Task bị interrupt, dừng tại dòng " + j);
                             return; // thoát task ngay
                         }
-                        String line = listLogString.get((int)j);
-
+                        String line = listLogString.get(index).get((int)j);
                         Object[] dataLog = Arrays.stream(line.split(" ")).map(
                                         x -> x.replace("[","").replace("]","")
                                 )
@@ -63,14 +63,14 @@ public class SearchLogServices extends DateTimeParser {
             System.exit(1);
         }
         long endTime = System.currentTimeMillis(); // kết thúc đo
-        System.out.println("Tổng thời gian chạy chương trình: " + (endTime - startTime) + " ms");
+        System.out.println("Tổng thời gian chạy chương trình : " + (endTime - startTime) + " ms");
         return new ArrayList<>(listLog);
     }
 
     public Set<Object[]> searchDataFromFileLog(List<Object[]> listDataLogFile
             ,int countThread
             ,SearchLog searchLog,long lines
-    ,long chunkSize) throws InterruptedException {
+            ,long chunkSize) throws InterruptedException, FileNotFoundException {
         long startTime = System.currentTimeMillis(); // bắt đầu đo
         Set<Object[]> setSearchDataFromFileLog = ConcurrentHashMap.newKeySet();
         ExecutorService executor = Executors.newFixedThreadPool(countThread);
@@ -122,7 +122,7 @@ public class SearchLogServices extends DateTimeParser {
             System.exit(1);
         }
         long endTime = System.currentTimeMillis(); // kết thúc đo
-        System.out.println("Tổng thời gian chạy chương trình: " + (endTime - startTime) + " ms");
+        System.out.println("Tổng thời gian chạy chương trìnha: " + (endTime - startTime) + " ms");
         return setSearchDataFromFileLog;
     }
 
@@ -150,25 +150,40 @@ public class SearchLogServices extends DateTimeParser {
         return LocalDateTime.parse(time, formatter);
     }
 
-    public Object[] parseLogLineFast(String line) {
-        // Tách dòng theo khoảng trắng
-        String[] tokens = line.split(" "); // array tạm token
 
-        // List để lưu token hợp lệ
-        List<String> result = new ArrayList<>(tokens.length);
+    public List<List<String>> chiaFile(String filePath,long chunkSize) throws FileNotFoundException {
+        List<List<String>> chunks = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))){
+            List<String> bf = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                bf.add(line);
+                if (bf.size() == chunkSize) {
+                    chunks.add(new ArrayList<>(bf));
+                    bf.clear();
+                }
+            }
 
-        // Duyệt từng token
-        for (String token : tokens) {
-            if (token.equals("-")) continue; // bỏ token là "-"
-
-            // Dùng StringBuilder để loại bỏ dấu '[' và ']'
-            token = token.replace("[","").replace("]","");
-
-            // Thêm token đã xử lý vào list
-            result.add(token);
+            if (!bf.isEmpty()) {
+                chunks.add(new ArrayList<>(bf));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        // Chuyển sang Object[] nếu cần
-        return result.toArray(new Object[0]);
+        return chunks;
     }
+
+    public List<List<Object[]>> chiaFileThanhPhan(List<Object[]> listData, long chunkSize) throws FileNotFoundException {
+        List<List<Object[]>> chunks = new ArrayList<>();
+        for(int i=0;i<listData.size();i++) {
+            List<Object[]> bf = new ArrayList<>();
+            bf.add(listData.get(i));
+            if (bf.size() == chunkSize) {
+                chunks.add(new ArrayList<>());
+            }
+        }
+        return chunks;
+    }
+
+
 }
